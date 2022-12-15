@@ -1,0 +1,14 @@
+.segments {
+  display: flex;
+  flex-direction: column;
+
+  padding: 20px 0;
+  gap: 20px;
+}
+
+.segment {
+  width: fit-content;
+
+  background: #afafaf;
+  padding: 5px;
+}

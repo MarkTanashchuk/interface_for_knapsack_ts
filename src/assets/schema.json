@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "properties": {
+    "segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "length",
+          "amount"
+        ],
+        "properties": {
+          "length": {
+            "type": "integer"
+          },
+          "amount": {
+            "type": "integer"
+          }
+        }
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "additionalItems": false
+    }
+  }
+}

@@ -1,0 +1,25 @@
+.content {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 200px;
+  
+  border: 1px solid black;
+
+  padding: 20px;
+  margin-left: 20px;
+}
+
+.input {
+  border: none;
+  border-bottom: 1px solid black;
+  box-shadow: none;
+  padding: 5px 10px;
+}
+
+@media (max-width: 480px) {
+  .content {
+    margin-left: 0;
+    margin-top: 20px;
+  }
+}

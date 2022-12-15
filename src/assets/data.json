@@ -1,0 +1,25 @@
+{
+  "$schema": "./schema.json",
+  "segments": [
+    {
+      "length": 120,
+      "amount": 10
+    },
+    {
+      "length": 140,
+      "amount": 15
+    },
+    {
+      "length": 150,
+      "amount": 10
+    },
+    {
+      "length": 230,
+      "amount": 6
+    },
+    {
+      "length": 300,
+      "amount": 3
+    }
+  ]
+}
