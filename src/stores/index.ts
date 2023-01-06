@@ -18,20 +18,77 @@ export function solveKnapsack(
   target: number,
   itemLimit: number
 ): Combination {
-  const bestCombination = solve(segments, target, itemLimit, itemLimit);
+  segments.sort((a, b) => b.length - a.length);
+  const approximateCombination = getApproximateCombination();
 
-  let limitPerItem = 1;
-  while (limitPerItem < itemLimit) {
-    const combination = solve(segments, target, itemLimit, limitPerItem);
+  if (
+    approximateCombination.totalLength === target ||
+    target / 10 >= target - approximateCombination.totalLength
+  ) {
+    return approximateCombination;
+  }
 
-    if (combination.totalLength == bestCombination.totalLength) {
-      return combination;
-    }
+  const bestCombination = getBestCombination();
 
-    limitPerItem += 1;
+  if (approximateCombination.totalLength >= bestCombination.totalLength) {
+    return approximateCombination;
   }
 
   return bestCombination;
+
+  function getBestCombination() {
+    let combination: Combination = {
+      items: [],
+      combination: [],
+      segments: [],
+      totalValue: 0,
+      totalLength: 0,
+    };
+
+    for (let limitPerItem = 1; limitPerItem <= itemLimit; limitPerItem += 1) {
+      const items = segments.reduce<Item[]>((acc, { length, amount }) => {
+        const limit = Math.min(limitPerItem, amount, itemLimit);
+        for (let i = 1; i <= limit; i += 1) {
+          acc.push({ weight: length, value: 1 });
+        }
+
+        return acc;
+      }, []);
+
+      const currentCombination = solve(items, target, itemLimit);
+
+      if (currentCombination.totalLength > combination.totalLength) {
+        combination = currentCombination;
+      }
+
+      if (combination.totalLength == target) {
+        break;
+      }
+    }
+
+    return combination;
+  }
+
+  function getApproximateCombination() {
+    const maxAmount = segments.reduce(
+      (maxAmount, { amount }) => Math.max(maxAmount, amount),
+      0
+    );
+    const items = segments.reduce<Item[]>((acc, { length, amount }) => {
+      const limit = Math.min(amount, itemLimit);
+
+      const baseValue = maxAmount / amount / 1;
+      let scalingValue = baseValue;
+      for (let i = 1; i <= limit; i += 1) {
+        scalingValue /= itemLimit;
+        acc.push({ weight: length, value: baseValue + scalingValue });
+      }
+
+      return acc;
+    }, []);
+
+    return solve(items, target, itemLimit);
+  }
 }
 
 // Returns the closest combination to `target` using smallest possible elements from `segments`
@@ -40,23 +97,7 @@ export function solveKnapsack(
 // ```
 // const result = solveKnapsack([{ length: 200, amount: 5 }, { length: 100, amount: 2 }], 900, 10);
 // ```
-function solve(
-  segments: Segment[],
-  target: number,
-  itemLimit: number,
-  limitPerType: number
-): Combination {
-  segments.sort((a, b) => b.length - a.length);
-
-  const items = segments.reduce<Item[]>((acc, { length, amount }) => {
-    const limit = Math.min(limitPerType, Math.min(amount, itemLimit));
-    for (let i = 1; i <= limit; i += 1) {
-      acc.push({ weight: length, value: 1 });
-    }
-
-    return acc;
-  }, []);
-
+function solve(items: Item[], target: number, itemLimit: number): Combination {
   itemLimit = Math.min(items.length, itemLimit);
 
   const cachedUnit: [number, number, Item[]] = [0, 0, []];

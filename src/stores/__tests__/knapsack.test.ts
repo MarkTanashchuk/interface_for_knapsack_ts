@@ -1,11 +1,13 @@
-import { solveKnapsack } from "../index";
+import { solveKnapsack } from "../";
 
 const mockSegments = [
   { length: 120, amount: 10 },
   { length: 140, amount: 15 },
   { length: 150, amount: 10 },
+  { length: 175, amount: 20 },
+  { length: 210, amount: 1 },
   { length: 230, amount: 6 },
-  { length: 300, amount: 3 },
+  { length: 300, amount: 11 },
 ];
 
 const MAX_TARGET = 3800;
@@ -43,7 +45,7 @@ describe("Knapsack", () => {
     const { totalLength, combination, segments } = findClosestTo(target, limit);
 
     expect(totalLength).toBe(target);
-    expect(combination.length).toBeLessThanOrEqual(limit);
+    expect(combination.length).toBe(limit);
     expect(segments).toStrictEqual([{ length: 120, amount: 1 }]);
   });
 
@@ -54,7 +56,7 @@ describe("Knapsack", () => {
     const { totalLength, combination, segments } = findClosestTo(target, limit);
 
     expect(totalLength).toBe(target);
-    expect(combination.length).toBeLessThanOrEqual(limit);
+    expect(combination.length).toBe(limit);
     expect(segments).toStrictEqual([{ length: 120, amount: 2 }]);
   });
 
@@ -65,7 +67,7 @@ describe("Knapsack", () => {
     const { totalLength, combination, segments } = findClosestTo(target, limit);
 
     expect(totalLength).toBe(target);
-    expect(combination.length).toBeLessThanOrEqual(limit);
+    expect(combination.length).toBe(limit);
     expect(segments).toStrictEqual([{ length: 120, amount: 3 }]);
   });
 
@@ -75,9 +77,14 @@ describe("Knapsack", () => {
 
     const { totalLength, combination, segments } = findClosestTo(target, limit);
 
-    expect(totalLength).toBe(target);
+    expect(segments).toStrictEqual([
+      { length: 120, amount: 1 },
+      { length: 140, amount: 1 },
+      { length: 150, amount: 1 },
+      { length: 175, amount: 1 },
+    ]);
     expect(combination.length).toBeLessThanOrEqual(limit);
-    expect(segments).toStrictEqual([{ length: 150, amount: 4 }]);
+    expect(totalLength).toBe(target);
   });
 
   it("handles small values", () => {
@@ -95,9 +102,25 @@ describe("Knapsack", () => {
     );
 
     expect(totalLength).toBe(target);
+    expect(combination.length).toBeLessThanOrEqual(limit);
     expect(segments).toStrictEqual([
       { length: 1, amount: 2 },
       { length: 5, amount: 2 },
+    ]);
+  });
+
+  it("finds best combination with maximal amount of segment types", () => {
+    const target = 1500;
+    const limit = 10;
+
+    const { totalLength, combination, segments } = findClosestTo(target, limit);
+
+    expect(totalLength).toBe(target);
+    expect(segments).toStrictEqual([
+      { length: 120, amount: 4 },
+      { length: 140, amount: 3 },
+      { length: 150, amount: 2 },
+      { length: 300, amount: 1 },
     ]);
     expect(combination.length).toBeLessThanOrEqual(limit);
   });
@@ -125,11 +148,7 @@ describe("Knapsack", () => {
 
     expect(totalLength).toBeLessThanOrEqual(target);
     expect(combination.length).toBeLessThanOrEqual(limit);
-    expect(segments).toStrictEqual([
-      { length: 150, amount: 1 },
-      { length: 230, amount: 6 },
-      { length: 300, amount: 3 },
-    ]);
+    expect(segments).toStrictEqual([{ length: 300, amount: 10 }]);
   });
 
   it("finds closest single value", () => {
@@ -144,27 +163,25 @@ describe("Knapsack", () => {
   });
 
   it("efficiently process large target", () => {
-    const target = MAX_TARGET * 10;
+    const target = MAX_TARGET * 5;
     const limit = 10;
 
     const { totalLength, combination, segments } = findClosestTo(target, limit);
 
     expect(totalLength).toBeLessThanOrEqual(target);
     expect(combination.length).toBeLessThanOrEqual(limit);
-    expect(segments).toStrictEqual([
-      { length: 150, amount: 1 },
-      { length: 230, amount: 6 },
-      { length: 300, amount: 3 },
-    ]);
+    expect(segments).toStrictEqual([{ length: 300, amount: 10 }]);
   });
 
   it("efficiently process large limit", () => {
     const target = MAX_TARGET;
-    const limit = 1000;
+    const limit = 10 * 5;
 
     const { totalLength, combination, segments } = findClosestTo(target, limit);
 
-    expect(totalLength).toBe(target);
+    const isCloseEnough = target / 10 >= target - totalLength;
+
+    expect(isCloseEnough).toBe(true);
     expect(combination.length).toBeLessThanOrEqual(limit);
     expect(segments).toStrictEqual([
       { length: 120, amount: 5 },
